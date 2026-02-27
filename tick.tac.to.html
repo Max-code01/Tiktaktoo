@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe - Ultimate Multi-Modus</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Tic Tac Toe (Multi-Modus)</h1>
+    
+    <div id="steuerung">
+        <label id="ki-label">
+            <input type="checkbox" id="ki-modus" checked>
+            Gegen Computer spielen
+        </label>
+        
+        <select id="ki-schwierigkeit" aria-label="KI Schwierigkeit auswählen">
+            <option value="hard">Schwer (Minimax - NUR 3x3!)</option>
+            <option value="easy">Einfach (Zufällig - für alle Modi)</option>
+        </select>
+
+        <select id="spiel-modus" aria-label="Spielmodus auswählen">
+            <option value="normal">Normal (3x3, 3 in Reihe)</option>
+            <option value="gomoku">Gó-Moku (9x9, 5 in Reihe)</option>
+            <option value="misere">Anti-TTT (3x3, Wer gewinnt, verliert)</option>
+            <option value="blocker">Blocker (3x3, O muss X hindern)</option>
+            <option value="zeitbombe">Zeitbombe (3x3, 5s pro Zug)</option>
+            <option value="tausch">Tausch (3x3, Zufällige Marker)</option>
+            <option value="entfernung">Entfernung (3x3, Keine Nachbarn)</option>
+        </select>
+    </div>
+
+    <div id="timer-container">
+        <span id="timer-label">Zeit: </span>
+        <span id="timer-wert">05</span>
+        <span id="timer-einheit">s</span>
+    </div>
+
+    <div id="status-nachricht"></div> 
+    
+    <div id="punktestand">
+        <span id="label-x">X</span>: <span id="punkte-x">0</span> |
+        <span id="label-o">O</span>: <span id="punkte-o">0</span> |
+        <span>Unentschieden: <span id="punkte-unentschieden">0</span></span>
+    </div>
+
+    <div id="spielfeld"></div>
+
+    <button id="neustart-button">Neues Spiel</button>
+
+    <div id="modal" class="hidden">
+        <div id="modal-content">
+            <p id="modal-text"></p>
+            <button id="modal-neustart">Nochmal spielen</button>
+        </div>
+    </div>
+    
+    <div id="toast-container"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+/* Grundlegende Typografie und Layout */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px;
+    background-color: #e9ecef;
+    color: #343a40;
+}
+
+h1 {
+    color: #007bff;
+    margin-bottom: 20px;
+}
+
+/* Steuerung und Einstellungen */
+#steuerung {
+    display: flex;
+    flex-wrap: wrap; 
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    max-width: 90%;
+    justify-content: center;
+}
+
+/* Timer-Stil */
+#timer-container {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    display: none; 
+}
+#timer-container.aktiv { display: block; }
+#timer-wert { color: #28a745; transition: color 0.5s; }
+#timer-wert.warnung { color: #ffc107; }
+#timer-wert.kritisch { color: #dc3545; }
+
+/* Status- und Punktestand-Anzeige */
+#status-nachricht {
+    font-size: 20px;
+    font-weight: bold;
+    color: #495057;
+    margin-bottom: 10px;
+    min-height: 24px;
+}
+
+#punktestand {
+    font-size: 18px;
+    margin-bottom: 25px;
+    padding: 8px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.aktiver-spieler { font-size: 1.2em; padding: 0 5px; border-radius: 3px; font-weight: 700; }
+#label-x { color: #FF5722; }
+#label-o { color: #2196F3; }
+
+/* Spielfeld-Gitter - Basis-Styles */
+#spielfeld {
+    display: grid;
+    gap: 1px;
+    margin: 20px 0;
+    border: 5px solid #343a40;
+    border-radius: 5px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    background-color: #b0c4de; 
+    transition: all 0.3s ease-in-out;
+}
+
+/* Modus-spezifische Grid-Anpassung: 3x3 */
+#spielfeld.drei-x-drei {
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+    gap: 5px;
+    background-color: transparent;
+}
+
+/* Modus-spezifische Grid-Anpassung: 9x9 */
+#spielfeld.neun-x-neun {
+    grid-template-columns: repeat(9, 35px);
+    grid-template-rows: repeat(9, 35px);
+    gap: 1px;
+}
+
+.zelle {
+    background-color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    user-select: none;
+    transition: background-color 0.15s;
+}
+
+/* Modus-spezifische Zellengrößen */
+#spielfeld.drei-x-drei .zelle {
+    font-size: 48px;
+}
+#spielfeld.neun-x-neun .zelle {
+    font-size: 18px;
+}
+
+/* Spielerfarben und Animationen (wie zuvor) */
+.zelle.x { color: #FF5722; }
+.zelle.o { color: #2196F3; }
+.zelle.gewinner { background-color: #ffd700; box-shadow: inset 0 0 15px rgba(255, 215, 0, 0.9); }
+#spielfeld.deaktiviert { opacity: 0.4; cursor: default; pointer-events: none; }
+.zelle.leer:hover.x-hover { background-color: rgba(255, 87, 34, 0.15); }
+.zelle.leer:hover.o-hover { background-color: rgba(33, 150, 243, 0.15); }
+
+/* Responsive Anpassungen */
+@media (max-width: 600px) {
+    #spielfeld.neun-x-neun {
+        grid-template-columns: repeat(9, 30px);
+        grid-template-rows: repeat(9, 30px);
+    }
+    #spielfeld.drei-x-drei {
+        grid-template-columns: repeat(3, 80px);
+        grid-template-rows: repeat(3, 80px);
+    }
+    #spielfeld.drei-x-drei .zelle { font-size: 40px; }
+    #spielfeld.neun-x-neun .zelle { font-size: 16px; }
+}
