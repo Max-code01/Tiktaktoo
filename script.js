@@ -97,7 +97,7 @@ function createParticles(color) {
 // F4: KI Trash-Talk System
 function kiChat(event) {
     const msgs = {
-        win: ["GG WP!", "Zu einfach für mich.", "Max, trainier mehr!", "System Error: Gegner zu schwach."],
+        win: ["GG WP!", "Zu einfach für mich.", "trainier mehr!", "System Error: Gegner zu schwach."],
         lose: ["Cheater!", "Das war ein Bug in meinem Code.", "Revanche sofort!", "Ich hab dich gewinnen lassen."],
         move: ["Hmm...", "Bist du sicher?", "Das war dein Fehler!", "Interessanter Zug."]
     };
@@ -414,7 +414,7 @@ function neustartSpiel() {
 // --- CHEAT-CODES (ERWEITERT) ---
 const cheatCodes = {
     'POWER': () => { punktestand.X += 10; zeigePunktestand(); zeigeToast("CHEAT: +10 Punkte!", 'success'); },
-    'MAX': () => beendeSpiel("Max gewinnt per Cheat! 🏆"),
+    'MAX': () => beendeSpiel("gewinnt per Cheat! 🏆"),
     'OOF': () => { punktestand = {X:0, O:0, Unentschieden:0}; zeigePunktestand(); },
     'XP': () => addXP(100)
 };
@@ -439,3 +439,4 @@ ladePunktestand();
 neustartSpiel();
 handleGhostPreview();
 zeigePunktestand();
+
