@@ -1,133 +1,165 @@
-/* Grundlegende Typografie und Layout */
+/* --- DARK-GAMING THEME BY MAX --- */
+:root {
+    --bg-dark: #0f172a;
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --primary-blue: #3b82f6;
+    --neon-x: #ff4d4d;
+    --neon-o: #00d2ff;
+    --gold-win: #fbbf24;
+    --text-main: #f1f5f9;
+    --glass-border: rgba(255, 255, 255, 0.1);
+}
+
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+    color: var(--text-main);
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 30px;
-    background-color: #e9ecef;
-    color: #343a40;
+    margin: 0;
+    padding-top: 40px;
+    overflow-x: hidden;
 }
 
 h1 {
-    color: #007bff;
+    font-size: 3rem;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    background: linear-gradient(to right, var(--neon-x), var(--neon-o));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.3));
+    margin-bottom: 30px;
+}
+
+/* --- STEUERUNG (Glassmorphism) --- */
+#steuerung {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    display: flex;
+    gap: 15px;
     margin-bottom: 20px;
 }
 
-/* Steuerung und Einstellungen */
-#steuerung {
+select, button {
+    background: #334155;
+    color: white;
+    border: 1px solid var(--glass-border);
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+select:hover { background: #475569; border-color: var(--primary-blue); }
+
+/* --- SPIELFELD (The Grid) --- */
+#spielfeld {
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    padding: 12px;
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#spielfeld:hover {
+    transform: translateY(-5px) scale(1.01);
+}
+
+/* Modus-Anpassungen */
+#spielfeld.drei-x-drei {
+    grid-template-columns: repeat(3, 110px);
+    grid-template-rows: repeat(3, 110px);
+    gap: 10px;
+}
+
+#spielfeld.neun-x-neun {
+    grid-template-columns: repeat(9, 38px);
+    grid-template-rows: repeat(9, 38px);
+    gap: 4px;
+}
+
+/* --- DIE ZELLEN (Neon & Glow) --- */
+.zelle {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    color: white;
     display: flex;
-    flex-wrap: wrap; 
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 15px;
-    max-width: 90%;
     justify-content: center;
+    align-items: center;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
 }
 
-/* Timer-Stil */
-#timer-container {
-    font-size: 22px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    padding: 5px 10px;
-    border-radius: 5px;
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    display: none; 
+.zelle:hover:not(.x):not(.o) {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.05);
 }
-#timer-container.aktiv { display: block; }
-#timer-wert { color: #28a745; transition: color 0.5s; }
-#timer-wert.warnung { color: #ffc107; }
-#timer-wert.kritisch { color: #dc3545; }
 
-/* Status- und Punktestand-Anzeige */
+/* X-Symbol (Neon Rot) */
+.zelle.x {
+    color: var(--neon-x);
+    text-shadow: 0 0 15px var(--neon-x), 0 0 30px var(--neon-x);
+    animation: markerPop 0.3s backwards;
+}
+
+/* O-Symbol (Neon Blau) */
+.zelle.o {
+    color: var(--neon-o);
+    text-shadow: 0 0 15px var(--neon-o), 0 0 30px var(--neon-o);
+    animation: markerPop 0.3s backwards;
+}
+
+@keyframes markerPop {
+    0% { transform: scale(0.5) rotate(-45deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+/* --- WINNER EFFECT --- */
+.zelle.gewinner {
+    background: var(--gold-win) !important;
+    color: #000 !important;
+    text-shadow: none;
+    box-shadow: 0 0 40px var(--gold-win);
+    z-index: 10;
+    transform: scale(1.1);
+}
+
+/* --- STATS DISPLAY --- */
 #status-nachricht {
-    font-size: 20px;
-    font-weight: bold;
-    color: #495057;
-    margin-bottom: 10px;
-    min-height: 24px;
+    margin-top: 15px;
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    height: 40px;
 }
 
 #punktestand {
-    font-size: 18px;
-    margin-bottom: 25px;
-    padding: 8px 15px;
-    border: 1px solid #ced4da;
-    border-radius: 8px;
-    background-color: #fff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.aktiver-spieler { font-size: 1.2em; padding: 0 5px; border-radius: 3px; font-weight: 700; }
-#label-x { color: #FF5722; }
-#label-o { color: #2196F3; }
-
-/* Spielfeld-Gitter - Basis-Styles */
-#spielfeld {
-    display: grid;
-    gap: 1px;
-    margin: 20px 0;
-    border: 5px solid #343a40;
-    border-radius: 5px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    background-color: #b0c4de; 
-    transition: all 0.3s ease-in-out;
-}
-
-/* Modus-spezifische Grid-Anpassung: 3x3 */
-#spielfeld.drei-x-drei {
-    grid-template-columns: repeat(3, 100px);
-    grid-template-rows: repeat(3, 100px);
-    gap: 5px;
-    background-color: transparent;
-}
-
-/* Modus-spezifische Grid-Anpassung: 9x9 */
-#spielfeld.neun-x-neun {
-    grid-template-columns: repeat(9, 35px);
-    grid-template-rows: repeat(9, 35px);
-    gap: 1px;
-}
-
-.zelle {
-    background-color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    margin-top: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px 30px;
+    border-radius: 50px;
+    border: 1px solid var(--glass-border);
     font-weight: bold;
-    user-select: none;
-    transition: background-color 0.15s;
 }
 
-/* Modus-spezifische Zellengrößen */
-#spielfeld.drei-x-drei .zelle {
-    font-size: 48px;
-}
-#spielfeld.neun-x-neun .zelle {
-    font-size: 18px;
-}
+/* Hover Vorschau */
+.zelle.leer:hover.x-hover::after { content: "X"; opacity: 0.2; color: var(--neon-x); }
+.zelle.leer:hover.o-hover::after { content: "O"; opacity: 0.2; color: var(--neon-o); }
 
-/* Spielerfarben und Animationen (wie zuvor) */
-.zelle.x { color: #FF5722; }
-.zelle.o { color: #2196F3; }
-.zelle.gewinner { background-color: #ffd700; box-shadow: inset 0 0 15px rgba(255, 215, 0, 0.9); }
-#spielfeld.deaktiviert { opacity: 0.4; cursor: default; pointer-events: none; }
-.zelle.leer:hover.x-hover { background-color: rgba(255, 87, 34, 0.15); }
-.zelle.leer:hover.o-hover { background-color: rgba(33, 150, 243, 0.15); }
-
-/* Responsive Anpassungen */
-@media (max-width: 600px) {
-    #spielfeld.neun-x-neun {
-        grid-template-columns: repeat(9, 30px);
-        grid-template-rows: repeat(9, 30px);
-    }
-    #spielfeld.drei-x-drei {
-        grid-template-columns: repeat(3, 80px);
-        grid-template-rows: repeat(3, 80px);
-    }
-    #spielfeld.drei-x-drei .zelle { font-size: 40px; }
-    #spielfeld.neun-x-neun .zelle { font-size: 16px; }
+/* Animation für den Hintergrund-Shake (wird per JS ausgelöst) */
+@keyframes shake {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(-5px, 5px); }
+    75% { transform: translate(5px, -5px); }
 }
