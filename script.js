@@ -1,38 +1,8 @@
-
-// ULTIMATE TIC-TAC-TOE ENGINE - VERSION 5.0 (EXTREM-EDITION)
-// + CLOUD & SECURITY ADDON
+// ===========================================================
+// MAX ULTIMATE TIC-TAC-TOE ENGINE - VERSION 5.0 (EXTREM-EDITION)
 // ===========================================================
 
-// --- NEU: CLOUD & SECURITY INITIALISIERUNG (Ganz oben eingefügt) ---
-const SUPABASE_URL = 'https://sfbubqwnuthicpenmwye.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_H-ZV5me7vxZN_fNPdQ0ifA_--7AdGnZ';
-let supabase;
-
-function connectToSupabase() {
-    if (window.supabase) {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        console.log("✅ Cloud-System bereit, Max!");
-        ladeLeaderboard();
-    } else {
-        setTimeout(connectToSupabase, 100);
-    }
-}
-connectToSupabase();
-
-// Hilfsfunktion für Passwort-Verschlüsselung (wie im Schach)
-function getSecureSalat(pass) {
-    return CryptoJS.SHA256(pass + "MAX_ULTIMATE_SALT_99").toString();
-}
-
-async function getIP() {
-    try {
-        const response = await fetch('https://api.ipify.org?format=json');
-        const data = await response.json();
-        return data.ip;
-    } catch(e) { return "127.0.0.1"; }
-}
-
-// --- 1. SPIELZUSTAND-VARIABLEN & KONSTANTEN (DEIN ORIGINAL) ---
+// --- 1. SPIELZUSTAND-VARIABLEN & KONSTANTEN ---
 let spielfeldZustand = []; 
 let aktuellerSpieler = "X";
 let spielAktiv = true;
@@ -43,7 +13,7 @@ let letzterIndexGesetzt = null;
 let feldGroesse = 3; 
 let gewinnLaenge = 3; 
 
-// --- EXTREM-ERWEITERUNGEN (DEIN ORIGINAL) ---
+// --- EXTREM-ERWEITERUNGEN (NEU) ---
 let winStreak = 0;
 let comboMultiplier = 1;
 let playerLevel = 1;
@@ -51,6 +21,7 @@ let xp = 0;
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 let matchHistory = JSON.parse(localStorage.getItem('matchHistory') || "[]");
 
+// Timer-Variablen
 let timerInterval;
 const MAX_TIME = 5;
 
@@ -59,7 +30,7 @@ const GEGNER_MARKER = "X";
 const gewinnKombinationen_3x3 = [
     [0, 1, 2], [3, 4, 5], [6, 7, 8], 
     [0, 3, 6], [1, 4, 7], [2, 5, 8], 
-    [0, 4, 8], [2, 4, 6]              
+    [0, 4, 8], [2, 4, 6]             
 ];
 
 // DOM-Elemente
@@ -78,8 +49,9 @@ const modalText = document.getElementById('modal-text');
 const toastContainer = document.getElementById('toast-container');
 const statusNachricht = document.getElementById('status-nachricht');
 
-// --- 2. EXTREM-FUNKTIONEN (DEIN ORIGINAL) ---
+// --- 2. EXTREM-FUNKTIONEN (DIE NEUEN 15 FEATURES) ---
 
+// F1: Sound-Synthesizer (Generiert Töne im Browser)
 function playEffect(freq, type = 'sine', duration = 0.1) {
     try {
         const osc = audioCtx.createOscillator();
@@ -94,12 +66,14 @@ function playEffect(freq, type = 'sine', duration = 0.1) {
     } catch(e) { console.log("Audio-Autoplay Blocked"); }
 }
 
+// F2: Screen Shake (Physisches Feedback)
 function triggerExtremeShake() {
     spielfeldElement.style.animation = 'none';
-    void spielfeldElement.offsetWidth; 
+    void spielfeldElement.offsetWidth; // Reflow
     spielfeldElement.style.animation = 'shake 0.4s cubic-bezier(.36,.07,.19,.97) both';
 }
 
+// F3: Partikel-System für Siege
 function createParticles(color) {
     for(let i = 0; i < 40; i++) {
         const p = document.createElement('div');
@@ -120,9 +94,10 @@ function createParticles(color) {
     }
 }
 
+// F4: KI Trash-Talk System
 function kiChat(event) {
     const msgs = {
-        win: ["GG WP!", "Zu einfach für mich.", "trainier mehr!", "System Error: Gegner zu schwach."],
+        win: ["GG WP!", "Zu einfach für mich.", "Max, trainier mehr!", "System Error: Gegner zu schwach."],
         lose: ["Cheater!", "Das war ein Bug in meinem Code.", "Revanche sofort!", "Ich hab dich gewinnen lassen."],
         move: ["Hmm...", "Bist du sicher?", "Das war dein Fehler!", "Interessanter Zug."]
     };
@@ -130,6 +105,7 @@ function kiChat(event) {
     zeigeToast(`🤖 KI: ${choice}`, event === 'lose' ? 'warnung' : 'info');
 }
 
+// F5: Ghost Preview (Vorschau beim Drüberfahren)
 function handleGhostPreview() {
     spielfeldElement.addEventListener('mouseover', (e) => {
         if(e.target.classList.contains('leer') && spielAktiv) {
@@ -144,6 +120,7 @@ function handleGhostPreview() {
     });
 }
 
+// F6: Level & XP System
 function addXP(amount) {
     xp += amount;
     if(xp >= playerLevel * 100) {
@@ -154,8 +131,9 @@ function addXP(amount) {
     }
 }
 
+// F7: Danger Zone Analysis (Gefahren-Check)
 function markDanger() {
-    zellen().forEach(z => z.style.boxShadow = ""); 
+    zellen().forEach(z => z.style.boxShadow = ""); // Reset
     const leere = findeLeereZellen(spielfeldZustand);
     leere.forEach(idx => {
         let test = [...spielfeldZustand];
@@ -166,25 +144,29 @@ function markDanger() {
     });
 }
 
+// F8: Match History Logger
 function saveToHistory(res) {
     matchHistory.unshift({ t: new Date().toLocaleTimeString(), r: res });
     localStorage.setItem('matchHistory', JSON.stringify(matchHistory.slice(0, 10)));
 }
 
+// F9: Dynamic Vibe Background (Farbe ändert sich je nach Spielstand)
 function updateBackgroundVibe() {
     const scoreDiff = punktestand.X - punktestand.O;
     const hue = 210 + (scoreDiff * 15);
     document.body.style.background = `radial-gradient(circle at center, hsl(${hue}, 40%, 15%), #0f172a)`;
 }
 
+// F10: Chaos Event System
 function checkChaosEvent() {
-    if(Math.random() < 0.03) { 
+    if(Math.random() < 0.03) { // 3% Chance
         triggerExtremeShake();
         playEffect(100, 'sawtooth', 0.3);
         zeigeToast("🌀 CHAOS-WELLE! Die KI ist verwirrt.", 'warnung');
     }
 }
 
+// F11: Combo System
 function updateCombo(sieger) {
     if(sieger === "X") {
         winStreak++;
@@ -195,9 +177,10 @@ function updateCombo(sieger) {
     }
 }
 
+// F12-F15: (Interne Optimierungen wie Auto-Save & Haptik-Simulation)
 function simulateHaptic() { if(window.navigator.vibrate) window.navigator.vibrate(50); }
 
-// --- 3. BESTEHENDE FUNKTIONEN (DEIN ORIGINAL) ---
+// --- 3. DEINE BESTEHENDEN FUNKTIONEN (ERWEITERT & VERBESSERT) ---
 
 function speicherePunktestand() { localStorage.setItem('tictactoePunktestand', JSON.stringify(punktestand)); }
 function ladePunktestand() {
@@ -247,8 +230,7 @@ function aktualisiereSpielerAnzeige() {
     labelX.classList.toggle('aktiver-spieler', aktuellerSpieler === "X");
     labelO.classList.toggle('aktiver-spieler', aktuellerSpieler === "O");
 
-    zelleElemente = zellen();
-    zelleElemente.forEach(zelle => {
+    zellen().forEach(zelle => {
         zelle.classList.remove('x-hover', 'o-hover', 'leer');
         if (zelle.textContent === "") {
             zelle.classList.add('leer', (aktuellerSpieler.toLowerCase() + '-hover'));
@@ -277,7 +259,7 @@ function starteTimer() {
 
 function stoppeTimer() { clearInterval(timerInterval); timerContainer.classList.remove('aktiv'); }
 
-// --- KI-LOGIK (DEIN ORIGINAL) ---
+// --- KI-LOGIK (ERWEITERT) ---
 
 function findeLeereZellen(brett) {
     return brett.map((wert, index) => (wert === "" ? index : null)).filter(index => index !== null);
@@ -353,7 +335,6 @@ function gewinnPruefenHaupt(index) {
     return false;
 }
 
-// --- MODIFIZIERT: beendeSpiel (Hier wird Cloud-Upload ergänzt, nichts gelöscht) ---
 function beendeSpiel(txt, kombi = null) {
     stoppeTimer(); spielAktiv = false;
     triggerExtremeShake();
@@ -363,11 +344,6 @@ function beendeSpiel(txt, kombi = null) {
     if(sieger === "X") {
         punktestand.X++; addXP(50 * comboMultiplier); updateCombo("X");
         createParticles("#ff4d4d"); playEffect(523, 'sine', 0.5);
-        
-        // Cloud-Speicherung (mit Passwort-Check wie beim Schach)
-        const name = document.getElementById('playerName')?.value || "Max";
-        speichereSiegCloud(name);
-
     } else if(sieger === "O") {
         punktestand.O++; updateCombo("O"); kiChat('win');
     } else {
@@ -376,13 +352,10 @@ function beendeSpiel(txt, kombi = null) {
 
     zeigePunktestand(); speicherePunktestand();
     zeigeModal(txt); 
-    if (kombi) {
-        const zelleElemente = zellen();
-        kombi.forEach(i => zelleElemente[i].classList.add('gewinner'));
-    }
+    if (kombi) kombi.forEach(i => zellen()[i].classList.add('gewinner'));
 }
 
-// --- 4. ZUG-LOGIK & EVENT HANDLER (DEIN ORIGINAL) ---
+// --- 4. ZUG-LOGIK & EVENT HANDLER ---
 
 function macheZug(index) {
     stoppeTimer();
@@ -396,9 +369,8 @@ function macheZug(index) {
     }
 
     spielfeldZustand[index] = marker;
-    const zelleElemente = zellen();
-    zelleElemente[index].innerHTML = `<span>${marker}</span>`;
-    zelleElemente[index].classList.add(marker.toLowerCase());
+    zellen()[index].innerHTML = `<span>${marker}</span>`;
+    zellen()[index].classList.add(marker.toLowerCase());
     letzterIndexGesetzt = index;
     
     checkChaosEvent();
@@ -414,9 +386,7 @@ function macheZug(index) {
 }
 
 function zelleGeklickt(e) {
-    const target = e.target.closest('.zelle');
-    if(!target) return;
-    const idx = parseInt(target.getAttribute('data-index'));
+    const idx = parseInt(e.target.getAttribute('data-index'));
     if (!spielAktiv || spielfeldZustand[idx] !== "" || (kiModusCheckbox.checked && aktuellerSpieler === KI_MARKER)) return;
 
     if (spielModus === 'entfernung' && letzterIndexGesetzt !== null) {
@@ -441,10 +411,10 @@ function neustartSpiel() {
     updateBackgroundVibe();
 }
 
-// --- CHEAT-CODES (DEIN ORIGINAL) ---
+// --- CHEAT-CODES (ERWEITERT) ---
 const cheatCodes = {
     'POWER': () => { punktestand.X += 10; zeigePunktestand(); zeigeToast("CHEAT: +10 Punkte!", 'success'); },
-    'MAX': () => beendeSpiel("gewinnt per Cheat! 🏆"),
+    'MAX': () => beendeSpiel("Max gewinnt per Cheat! 🏆"),
     'OOF': () => { punktestand = {X:0, O:0, Unentschieden:0}; zeigePunktestand(); },
     'XP': () => addXP(100)
 };
@@ -460,56 +430,6 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// --- NEU: CLOUD LOGIK (ERWEITERT UM PASSWORT & XP) ---
-async function speichereSiegCloud(name) {
-    if(!supabase) return;
-    const userIP = await getIP();
-    const passRaw = document.getElementById('playerPass')?.value || "";
-    const hashedPass = getSecureSalat(passRaw);
-    
-    // IP-Ban Check
-    const { data: banData } = await supabase.from('banned_ips').select('*').eq('ip', userIP);
-    if(banData && banData.length > 0) {
-        zeigeToast("DEINE IP IST GESPERRT!", 'warnung');
-        return;
-    }
-
-    const { data: userData } = await supabase.from('players').select('*').eq('username', name).single();
-    
-    if (userData) {
-        // Passwort-Check (wie beim Schach)
-        if(userData.password && userData.password !== hashedPass) {
-            zeigeToast("Falsches Passwort für Cloud-Save!", 'warnung');
-            return;
-        }
-        
-        await supabase.from('players').update({ 
-            wins: (userData.wins || 0) + 1, 
-            xp: (userData.xp || 0) + (50 * comboMultiplier), // XP mit Combo-Bonus
-            ip_address: userIP 
-        }).eq('username', name);
-    } else {
-        // Neuen Account anlegen
-        await supabase.from('players').insert([{ 
-            username: name, 
-            password: hashedPass,
-            wins: 1, 
-            xp: 50,
-            ip_address: userIP 
-        }]);
-    }
-    ladeLeaderboard();
-}
-
-async function ladeLeaderboard() {
-    if(!supabase) return;
-    const { data } = await supabase.from('players').select('username, wins, xp').order('wins', { ascending: false }).limit(5);
-    const list = document.getElementById('leaderboard-list');
-    if(list && data) {
-        list.innerHTML = data.map((p, i) => `<li>#${i+1} ${p.username}: ${p.wins} W (${p.xp || 0} XP)</li>`).join('');
-    }
-}
-
 // INITIALISIERUNG
 document.getElementById('neustart-button').addEventListener('click', neustartSpiel);
 modalNeustart.addEventListener('click', neustartSpiel);
@@ -519,4 +439,3 @@ ladePunktestand();
 neustartSpiel();
 handleGhostPreview();
 zeigePunktestand();
-
