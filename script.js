@@ -1,5 +1,5 @@
-// ===========================================================
-// MAX ULTIMATE TIC-TAC-TOE ENGINE - VERSION 5.0 (EXTREM-EDITION)
+
+// ULTIMATE TIC-TAC-TOE ENGINE - VERSION 5.0 (EXTREM-EDITION)
 // + CLOUD & SECURITY ADDON
 // ===========================================================
 
@@ -519,3 +519,4 @@ ladePunktestand();
 neustartSpiel();
 handleGhostPreview();
 zeigePunktestand();
+
