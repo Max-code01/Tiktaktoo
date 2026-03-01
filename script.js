@@ -19,6 +19,11 @@ function connectToSupabase() {
 }
 connectToSupabase();
 
+// Hilfsfunktion für Passwort-Verschlüsselung (wie im Schach)
+function getSecureSalat(pass) {
+    return CryptoJS.SHA256(pass + "MAX_ULTIMATE_SALT_99").toString();
+}
+
 async function getIP() {
     try {
         const response = await fetch('https://api.ipify.org?format=json');
@@ -54,7 +59,7 @@ const GEGNER_MARKER = "X";
 const gewinnKombinationen_3x3 = [
     [0, 1, 2], [3, 4, 5], [6, 7, 8], 
     [0, 3, 6], [1, 4, 7], [2, 5, 8], 
-    [0, 4, 8], [2, 4, 6]             
+    [0, 4, 8], [2, 4, 6]              
 ];
 
 // DOM-Elemente
@@ -242,7 +247,8 @@ function aktualisiereSpielerAnzeige() {
     labelX.classList.toggle('aktiver-spieler', aktuellerSpieler === "X");
     labelO.classList.toggle('aktiver-spieler', aktuellerSpieler === "O");
 
-    zellen().forEach(zelle => {
+    zelleElemente = zellen();
+    zelleElemente.forEach(zelle => {
         zelle.classList.remove('x-hover', 'o-hover', 'leer');
         if (zelle.textContent === "") {
             zelle.classList.add('leer', (aktuellerSpieler.toLowerCase() + '-hover'));
@@ -358,7 +364,7 @@ function beendeSpiel(txt, kombi = null) {
         punktestand.X++; addXP(50 * comboMultiplier); updateCombo("X");
         createParticles("#ff4d4d"); playEffect(523, 'sine', 0.5);
         
-        // NEU: Max, hier laden wir deinen Sieg hoch!
+        // Cloud-Speicherung (mit Passwort-Check wie beim Schach)
         const name = document.getElementById('playerName')?.value || "Max";
         speichereSiegCloud(name);
 
@@ -370,7 +376,10 @@ function beendeSpiel(txt, kombi = null) {
 
     zeigePunktestand(); speicherePunktestand();
     zeigeModal(txt); 
-    if (kombi) kombi.forEach(i => zellen()[i].classList.add('gewinner'));
+    if (kombi) {
+        const zelleElemente = zellen();
+        kombi.forEach(i => zelleElemente[i].classList.add('gewinner'));
+    }
 }
 
 // --- 4. ZUG-LOGIK & EVENT HANDLER (DEIN ORIGINAL) ---
@@ -387,8 +396,9 @@ function macheZug(index) {
     }
 
     spielfeldZustand[index] = marker;
-    zellen()[index].innerHTML = `<span>${marker}</span>`;
-    zellen()[index].classList.add(marker.toLowerCase());
+    const zelleElemente = zellen();
+    zelleElemente[index].innerHTML = `<span>${marker}</span>`;
+    zelleElemente[index].classList.add(marker.toLowerCase());
     letzterIndexGesetzt = index;
     
     checkChaosEvent();
@@ -404,7 +414,9 @@ function macheZug(index) {
 }
 
 function zelleGeklickt(e) {
-    const idx = parseInt(e.target.getAttribute('data-index'));
+    const target = e.target.closest('.zelle');
+    if(!target) return;
+    const idx = parseInt(target.getAttribute('data-index'));
     if (!spielAktiv || spielfeldZustand[idx] !== "" || (kiModusCheckbox.checked && aktuellerSpieler === KI_MARKER)) return;
 
     if (spielModus === 'entfernung' && letzterIndexGesetzt !== null) {
@@ -448,33 +460,53 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// --- NEU: CLOUD LOGIK (Ganz unten angehängt) ---
+// --- NEU: CLOUD LOGIK (ERWEITERT UM PASSWORT & XP) ---
 async function speichereSiegCloud(name) {
     if(!supabase) return;
     const userIP = await getIP();
+    const passRaw = document.getElementById('playerPass')?.value || "";
+    const hashedPass = getSecureSalat(passRaw);
     
-    // Check ob IP gebannt (Optionales Feature)
+    // IP-Ban Check
     const { data: banData } = await supabase.from('banned_ips').select('*').eq('ip', userIP);
     if(banData && banData.length > 0) {
         zeigeToast("DEINE IP IST GESPERRT!", 'warnung');
         return;
     }
 
-    const { data } = await supabase.from('players').select('wins').eq('username', name).single();
-    if (data) {
-        await supabase.from('players').update({ wins: (data.wins || 0) + 1, ip_address: userIP }).eq('username', name);
+    const { data: userData } = await supabase.from('players').select('*').eq('username', name).single();
+    
+    if (userData) {
+        // Passwort-Check (wie beim Schach)
+        if(userData.password && userData.password !== hashedPass) {
+            zeigeToast("Falsches Passwort für Cloud-Save!", 'warnung');
+            return;
+        }
+        
+        await supabase.from('players').update({ 
+            wins: (userData.wins || 0) + 1, 
+            xp: (userData.xp || 0) + (50 * comboMultiplier), // XP mit Combo-Bonus
+            ip_address: userIP 
+        }).eq('username', name);
     } else {
-        await supabase.from('players').insert([{ username: name, wins: 1, ip_address: userIP }]);
+        // Neuen Account anlegen
+        await supabase.from('players').insert([{ 
+            username: name, 
+            password: hashedPass,
+            wins: 1, 
+            xp: 50,
+            ip_address: userIP 
+        }]);
     }
     ladeLeaderboard();
 }
 
 async function ladeLeaderboard() {
     if(!supabase) return;
-    const { data } = await supabase.from('players').select('username, wins').order('wins', { ascending: false }).limit(5);
+    const { data } = await supabase.from('players').select('username, wins, xp').order('wins', { ascending: false }).limit(5);
     const list = document.getElementById('leaderboard-list');
     if(list && data) {
-        list.innerHTML = data.map((p, i) => `<li>#${i+1} ${p.username}: ${p.wins} Siege</li>`).join('');
+        list.innerHTML = data.map((p, i) => `<li>#${i+1} ${p.username}: ${p.wins} W (${p.xp || 0} XP)</li>`).join('');
     }
 }
 
