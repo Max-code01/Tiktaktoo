@@ -1,5 +1,5 @@
 /* ===========================================================
-   MAX ULTIMATE TIC-TAC-TOE STYLESHEET - VERSION 6.0 
+   ULTIMATE TIC-TAC-TOE STYLESHEET - VERSION 6.0 
    =========================================================== */
 
 :root {
@@ -191,3 +191,4 @@ select:hover, button:hover {
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     z-index: 1000;
 }
+
