@@ -3,93 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAX ULTIMATE TIC-TAC-TOE - EXTREM EDITION 5.0</title>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
+    <title>Tic Tac Toe - Ultimate Multi-Modus</title>
     <link rel="stylesheet" href="style.css">
-    
-    <style>
-        /* Zusätzliche Styles für das Login-System & Leaderboard */
-        :root {
-            --glass-bg: rgba(30, 41, 59, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --accent-gold: #fbbf24;
-        }
-
-        #login-section, #leaderboard-container {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            border-radius: 15px;
-            margin: 20px auto;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            color: white;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-
-        .input-style {
-            padding: 12px;
-            margin: 8px 0;
-            border-radius: 8px;
-            border: 1px solid #444;
-            background: #0f172a;
-            color: white;
-            width: 80%;
-            font-size: 1rem;
-        }
-
-        #leaderboard-list {
-            list-style: none;
-            padding: 0;
-            text-align: left;
-            font-family: 'Courier New', Courier, monospace;
-        }
-
-        #leaderboard-list li {
-            padding: 8px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .rank-1 { color: var(--accent-gold); font-weight: bold; }
-    </style>
 </head>
 <body>
-
-    <h1>MAX ULTIMATE TIC-TAC-TOE</h1>
-
-    <div id="login-section">
-        <h3>🔐 Spieler-Login</h3>
-        <input type="text" id="playerName" class="input-style" placeholder="Dein Name">
-        <input type="password" id="playerPass" class="input-style" placeholder="Dein Passwort">
-        <p style="font-size: 0.75em; color: #94a3b8;">Hinweis: Beim ersten Mal wird dein Account automatisch mit diesem Passwort erstellt.</p>
-    </div>
-
+    <h1>Tic Tac Toe (Multi-Modus)</h1>
+    
     <div id="steuerung">
         <label id="ki-label">
             <input type="checkbox" id="ki-modus" checked>
             Gegen Computer spielen
         </label>
         
-        <select id="ki-schwierigkeit">
-            <option value="hard">Schwer (Minimax - 3x3)</option>
-            <option value="easy">Einfach (Zufall)</option>
+        <select id="ki-schwierigkeit" aria-label="KI Schwierigkeit auswählen">
+            <option value="hard">Schwer (Minimax - NUR 3x3!)</option>
+            <option value="easy">Einfach (Zufällig - für alle Modi)</option>
         </select>
 
-        <select id="spiel-modus">
-            <option value="normal">Normal (3x3, 3er)</option>
-            <option value="gomoku">Gó-Moku (9x9, 5er)</option>
-            <option value="misere">Anti-TTT (Verlieren ist Win)</option>
-            <option value="blocker">Blocker (O blockt X)</option>
-            <option value="zeitbombe">Zeitbombe (5s Limit)</option>
-            <option value="tausch">Tausch (Random Marker)</option>
-            <option value="entfernung">Entfernung (Keine Nachbarn)</option>
+        <select id="spiel-modus" aria-label="Spielmodus auswählen">
+            <option value="normal">Normal (3x3, 3 in Reihe)</option>
+            <option value="gomoku">Gó-Moku (9x9, 5 in Reihe)</option>
+            <option value="misere">Anti-TTT (3x3, Wer gewinnt, verliert)</option>
+            <option value="blocker">Blocker (3x3, O muss X hindern)</option>
+            <option value="zeitbombe">Zeitbombe (3x3, 5s pro Zug)</option>
+            <option value="tausch">Tausch (3x3, Zufällige Marker)</option>
+            <option value="entfernung">Entfernung (3x3, Keine Nachbarn)</option>
         </select>
     </div>
 
@@ -99,29 +37,22 @@
         <span id="timer-einheit">s</span>
     </div>
 
-    <div id="status-nachricht">Bereit für die Action?</div> 
+    <div id="status-nachricht"></div> 
     
     <div id="punktestand">
         <span id="label-x">X</span>: <span id="punkte-x">0</span> |
         <span id="label-o">O</span>: <span id="punkte-o">0</span> |
-        <span>Handshake: <span id="punkte-unentschieden">0</span></span>
+        <span>Unentschieden: <span id="punkte-unentschieden">0</span></span>
     </div>
 
     <div id="spielfeld"></div>
 
-    <button id="neustart-button">SPIEL NEUSTARTEN</button>
-
-    <div id="leaderboard-container">
-        <h3 style="color: var(--accent-gold);">🏆 Weltweite Top 5</h3>
-        <ul id="leaderboard-list">
-            <li>Lade globale Daten...</li>
-        </ul>
-    </div>
+    <button id="neustart-button">Neues Spiel</button>
 
     <div id="modal" class="hidden">
         <div id="modal-content">
-            <h2 id="modal-text"></h2>
-            <button id="modal-neustart">NÄCHSTE RUNDE</button>
+            <p id="modal-text"></p>
+            <button id="modal-neustart">Nochmal spielen</button>
         </div>
     </div>
     
